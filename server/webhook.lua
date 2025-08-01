@@ -6,21 +6,7 @@ local function getDetails()
 end
 
 SetHttpHandler(function(req, res)
-    if req.path == Config.WebhookPath and req.method == "POST" then
-        local body = ""
-        req.setDataHandler(function(chunk) body = body .. chunk end)
-        local success, data = pcall(json.decode, body)
-        if not success then
-            res.send("Invalid JSON")
-            return
-        end
-
-        LogDebug(("Webhook: Received %s %s request from %s"):format(req.method, req.path, req.address))
-        LogDebug(json.encode(data, { indent = true }))
-
-        res.writeHead(200, { ["Content-Type"] = "application/json" })
-        res.send(json.encode({ ok = true }, { indent = false, sort_keys = false }))
-    elseif req.path == Config.WebhookPath .. '/details' and req.method == "GET" then
+    if req.path == Config.WebhookPath .. '/details' and req.method == "GET" then
         LogDebug(("Webhook: Received %s %s request from %s"):format(req.method, req.path, req.address))
 
         res.writeHead(200, { ["Content-Type"] = "application/json" })
