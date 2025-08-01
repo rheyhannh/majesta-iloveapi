@@ -32,86 +32,88 @@ end
 
 -- Webhook Handler
 
-SetHttpHandler(function(req, res)
-    if req.path == Config.WebhookPath .. '/details' and req.method == "GET" then
-        LogDebug(("Webhook: Received %s %s request from %s"):format(req.method, req.path, req.address))
+if Config.UseWebhook then
+    SetHttpHandler(function(req, res)
+        if req.path == Config.WebhookPath .. '/details' and req.method == "GET" then
+            LogDebug(("Webhook: Received %s %s request from %s"):format(req.method, req.path, req.address))
 
-        res.writeHead(200, { ["Content-Type"] = "application/json" })
-        res.send(json.encode({ ok = true, data = getDetails() }, { indent = false, sort_keys = false }))
-    elseif req.path == Config.WebhookPath .. '/cropimage' and req.method == 'POST' then
-        local body = ""
-        req.setDataHandler(function(chunk) body = body .. chunk end)
-        local success, data = pcall(json.decode, body)
-        if not success then
-            res.writeHead(400, { ["Content-Type"] = "application/json" })
-            res.send(json.encode({ ok = false, msg = "Invalid JSON" },
-                { indent = false, sort_keys = false }))
-            return
+            res.writeHead(200, { ["Content-Type"] = "application/json" })
+            res.send(json.encode({ ok = true, data = getDetails() }, { indent = false, sort_keys = false }))
+        elseif req.path == Config.WebhookPath .. '/cropimage' and req.method == 'POST' then
+            local body = ""
+            req.setDataHandler(function(chunk) body = body .. chunk end)
+            local success, data = pcall(json.decode, body)
+            if not success then
+                res.writeHead(400, { ["Content-Type"] = "application/json" })
+                res.send(json.encode({ ok = false, msg = "Invalid JSON" },
+                    { indent = false, sort_keys = false }))
+                return
+            end
+
+            LogDebug(("Webhook: Received %s %s request from [%s]"):format(req.method, req.path, req.address))
+            LogDebug(json.encode(data, { indent = true }))
+
+            local invalidData = _isRequestBodyInvalid({ 'image_url', 'filename', 'width', 'height' }, data)
+
+            if invalidData then
+                res.writeHead(400, { ["Content-Type"] = "application/json" })
+                res.send(json.encode({ ok = false, msg = invalidData },
+                    { indent = false, sort_keys = false }))
+                return
+            end
+
+            CropImageSync(
+                data.image_url,
+                data.path or nil,
+                data.filename,
+                data.resource_name or nil,
+                data.width,
+                data.height,
+                data.x or 0,
+                data.y or 0,
+                nil
+            )
+
+            res.writeHead(200, { ["Content-Type"] = "application/json" })
+            res.send(json.encode({ ok = true }, { indent = false, sort_keys = false }))
+        elseif req.path == Config.WebhookPath .. '/removebackgroundimage' and req.method == 'POST' then
+            local body = ""
+            req.setDataHandler(function(chunk) body = body .. chunk end)
+            local success, data = pcall(json.decode, body)
+            if not success then
+                res.writeHead(400, { ["Content-Type"] = "application/json" })
+                res.send(json.encode({ ok = false, msg = "Invalid JSON" },
+                    { indent = false, sort_keys = false }))
+                return
+            end
+
+            LogDebug(("Webhook: Received %s %s request from [%s]"):format(req.method, req.path, req.address))
+            LogDebug(json.encode(data, { indent = true }))
+
+            local invalidData = _isRequestBodyInvalid({ 'image_url', 'filename' }, data)
+
+            if invalidData then
+                res.writeHead(400, { ["Content-Type"] = "application/json" })
+                res.send(json.encode({ ok = false, msg = invalidData },
+                    { indent = false, sort_keys = false }))
+                return
+            end
+
+            RemoveBackgroundImageSync(
+                data.image_url,
+                data.path or nil,
+                data.filename,
+                data.resource_name or nil,
+                nil
+            )
+
+            res.writeHead(200, { ["Content-Type"] = "application/json" })
+            res.send(json.encode({ ok = true }, { indent = false, sort_keys = false }))
+        else
+            LogWarn(("Webhook: Received %s %s request from [%s]"):format(req.method, req.path, req.address))
+
+            res.writeHead(404, { ["Content-Type"] = "application/json" })
+            res.send(json.encode({ ok = false, msg = 'Route not found' }, { indent = false, sort_keys = false }))
         end
-
-        LogDebug(("Webhook: Received %s %s request from [%s]"):format(req.method, req.path, req.address))
-        LogDebug(json.encode(data, { indent = true }))
-
-        local invalidData = _isRequestBodyInvalid({ 'image_url', 'filename', 'width', 'height' }, data)
-
-        if invalidData then
-            res.writeHead(400, { ["Content-Type"] = "application/json" })
-            res.send(json.encode({ ok = false, msg = invalidData },
-                { indent = false, sort_keys = false }))
-            return
-        end
-
-        CropImageSync(
-            data.image_url,
-            data.path or nil,
-            data.filename,
-            data.resource_name or nil,
-            data.width,
-            data.height,
-            data.x or 0,
-            data.y or 0,
-            nil
-        )
-
-        res.writeHead(200, { ["Content-Type"] = "application/json" })
-        res.send(json.encode({ ok = true }, { indent = false, sort_keys = false }))
-    elseif req.path == Config.WebhookPath .. '/removebackgroundimage' and req.method == 'POST' then
-        local body = ""
-        req.setDataHandler(function(chunk) body = body .. chunk end)
-        local success, data = pcall(json.decode, body)
-        if not success then
-            res.writeHead(400, { ["Content-Type"] = "application/json" })
-            res.send(json.encode({ ok = false, msg = "Invalid JSON" },
-                { indent = false, sort_keys = false }))
-            return
-        end
-
-        LogDebug(("Webhook: Received %s %s request from [%s]"):format(req.method, req.path, req.address))
-        LogDebug(json.encode(data, { indent = true }))
-
-        local invalidData = _isRequestBodyInvalid({ 'image_url', 'filename' }, data)
-
-        if invalidData then
-            res.writeHead(400, { ["Content-Type"] = "application/json" })
-            res.send(json.encode({ ok = false, msg = invalidData },
-                { indent = false, sort_keys = false }))
-            return
-        end
-
-        RemoveBackgroundImageSync(
-            data.image_url,
-            data.path or nil,
-            data.filename,
-            data.resource_name or nil,
-            nil
-        )
-
-        res.writeHead(200, { ["Content-Type"] = "application/json" })
-        res.send(json.encode({ ok = true }, { indent = false, sort_keys = false }))
-    else
-        LogWarn(("Webhook: Received %s %s request from [%s]"):format(req.method, req.path, req.address))
-
-        res.writeHead(404, { ["Content-Type"] = "application/json" })
-        res.send(json.encode({ ok = false, msg = 'Route not found' }, { indent = false, sort_keys = false }))
-    end
-end)
+    end)
+end

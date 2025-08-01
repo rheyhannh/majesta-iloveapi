@@ -29,6 +29,15 @@ Config.ProcessUrl = 'https://%s/v1/process'
 -- First `%s` is the ILoveApi subdomain, second `%s` is the task ID.
 Config.DownloadUrl = 'https://%s/v1/download/%s'
 
--- Webhook endpoint path that handles incoming requests from ILoveApi.
--- Set this in your `server.cfg` using: set iloveapi_webhook_path "/your_path"
+-- Enables the webhook endpoint for testing image processing, retrieving JWT details, listing all tasks.
+--
+-- ⚠️ It is strongly recommended to disable this on production servers for security reasons.
+Config.UseWebhook = true
+
+-- Webhook endpoint path used for for testing image processing, retrieving JWT details, listing all tasks.
+-- To enable this endpoint, you must configure it in your `server.cfg`:
+--
+--   `set iloveapi_webhook_path "/your_path"`
+--
+-- ⚠️ Note: This webhook is only active if `Config.UseWebhook` is set to `true`.
 Config.WebhookPath = GetConvar("iloveapi_webhook_path", "/webhook")
