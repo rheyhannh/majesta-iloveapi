@@ -1,6 +1,16 @@
 -- Utils
 
-local function downloadImage(url, headers, path, filename, resourceName)
+--- Internal method to downloads an image from the given URL and saves it to a specific resource folder in the FiveM server.
+---
+--- This function uses `PerformHttpRequest` to perform a GET request, then stores the image using `SaveResourceFile`.
+--- If the download is successful, the file is saved at the specified path within the given resource folder.
+--- @param url string Direct URL to the image file to be downloaded.
+--- @param headers table A table of optional request headers.
+--- @param path? string Relative folder path inside the resource (should end with `/`). Use `nil`, to save on root of resource folder.
+--- @param filename string Desired file name (with extension) for the saved image (e.g., `'result.jpg'`).
+--- @param resourceName string Name of the target resource where the image should be saved.
+local function _downloadImage(url, headers, path, filename, resourceName)
+    -- TODO: Sanitize params.
     PerformHttpRequest(url, function(status, data, resHeaders)
         local fullPath = nil
         if status ~= 200 then
@@ -121,7 +131,7 @@ function CropImageSync(imageUrl, path, filename, resourceName, width, height, x,
             timer = timer
         })
     else
-        downloadImage(downloadSetup.url, headers, path, downloadFilename, resourceName)
+        _downloadImage(downloadSetup.url, headers, path, downloadFilename, resourceName)
     end
 end
 
@@ -220,7 +230,7 @@ function RemoveBackgroundImageSync(imageUrl, path, filename, resourceName, cb)
             timer = timer
         })
     else
-        downloadImage(downloadSetup.url, headers, path, downloadFilename, resourceName)
+        _downloadImage(downloadSetup.url, headers, path, downloadFilename, resourceName)
     end
 end
 

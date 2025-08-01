@@ -1,3 +1,13 @@
+-- #region Type Definitions
+
+---@class MajestaHttpRequestReturnType
+---@field code integer HTTP status codes.
+---@field ok boolean Whether the request was successful.
+---@field data any JSON-decoded response body if applicable, or raw string.
+---@field headers table Table of response headers.
+
+-- #endregion
+
 --- Log debug message with formatted string and color.
 --- @param msg string Message to be logged.
 function LogDebug(msg)
@@ -83,6 +93,17 @@ function BuildDownloadReq(server, task)
     return { url = url }
 end
 
+--- Sends an HTTP request and returns a structured response object using `PerformHttpRequest`.
+--- Automatically handles:
+---  - HTTP method, body, and headers
+---  - Promise-based async flow with `Citizen.Await`
+---  - JSON decoding if the response content type is `application/json`
+---  - `ok` flag set to `true` only for 2xx status codes
+--- @param url string URL to send the request to.
+--- @param method? string HTTP method, defaults to `"GET"`.
+--- @param body? string Request body, defaults to an empty string.
+--- @param headers? table Table of request headers, defaults to an empty table.
+--- @return MajestaHttpRequestReturnType R Table containing response.
 function MajestaHttpRequest(url, method, body, headers)
     local p = promise.new()
 
