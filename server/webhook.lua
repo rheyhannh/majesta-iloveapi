@@ -1,9 +1,36 @@
+-- Utils
+
 local function getDetails()
     local auth = GetAuth()
     return {
         auth = auth
     }
 end
+
+--- Internal method to validates if all required properties exist in the given request body table.
+--- Returns a string message listing missing properties, or `false` if all required fields are present.
+--- @param requiredProps table<number, string> List of required property names.
+--- @param body table Request body to validate.
+local function _isRequestBodyInvalid(requiredProps, body)
+    local missing = {}
+
+    for _, prop in ipairs(requiredProps) do
+        if body[prop] == nil then
+            table.insert(missing, prop)
+        end
+    end
+
+    local count = #missing
+    if count == 0 then
+        return false
+    elseif count == 1 then
+        return ("Missing required field: '%s'"):format(missing[1])
+    else
+        return ("Missing required field: ['%s']"):format(table.concat(missing, "', '"))
+    end
+end
+
+-- Webhook Handler
 
 SetHttpHandler(function(req, res)
     if req.path == Config.WebhookPath .. '/details' and req.method == "GET" then
@@ -20,19 +47,29 @@ SetHttpHandler(function(req, res)
             return
         end
 
-        if not data.imageUrl then
+        LogDebug(("Webhook: Received %s %s request from [%s]"):format(req.method, req.path, req.address))
+        LogDebug(json.encode(data, { indent = true }))
+
+        local invalidData = _isRequestBodyInvalid({ 'image_url', 'filename', 'width', 'height' }, data)
+
+        if invalidData then
             res.writeHead(400, { ["Content-Type"] = "application/json" })
-            res.send(json.encode({ ok = false, msg = "Missing required field: 'imageUrl'" },
+            res.send(json.encode({ ok = false, msg = invalidData },
                 { indent = false, sort_keys = false }))
             return
         end
 
-        local imageUrl = data.imageUrl
-
-        LogDebug(("Webhook: Received %s %s request from %s"):format(req.method, req.path, req.address))
-        LogDebug(json.encode(data, { indent = true }))
-
-        CropImageSync(imageUrl, 'images/', 'test_crop.jpg', 'es-idcard', 237, 299, 785, 255)
+        CropImageSync(
+            data.image_url,
+            data.path or nil,
+            data.filename,
+            data.resource_name or nil,
+            data.width,
+            data.height,
+            data.x or 0,
+            data.y or 0,
+            nil
+        )
 
         res.writeHead(200, { ["Content-Type"] = "application/json" })
         res.send(json.encode({ ok = true }, { indent = false, sort_keys = false }))
@@ -45,19 +82,25 @@ SetHttpHandler(function(req, res)
             return
         end
 
-        if not data.imageUrl then
+        LogDebug(("Webhook: Received %s %s request from [%s]"):format(req.method, req.path, req.address))
+        LogDebug(json.encode(data, { indent = true }))
+
+        local invalidData = _isRequestBodyInvalid({ 'image_url', 'filename' }, data)
+
+        if invalidData then
             res.writeHead(400, { ["Content-Type"] = "application/json" })
-            res.send(json.encode({ ok = false, msg = "Missing required field: 'imageUrl'" },
+            res.send(json.encode({ ok = false, msg = invalidData },
                 { indent = false, sort_keys = false }))
             return
         end
 
-        local imageUrl = data.imageUrl
-
-        LogDebug(("Webhook: Received %s %s request from %s"):format(req.method, req.path, req.address))
-        LogDebug(json.encode(data, { indent = true }))
-
-        RemoveBackgroundImageSync(imageUrl, 'images/', 'test_removebg.png', 'es-idcard')
+        RemoveBackgroundImageSync(
+            data.image_url,
+            data.path or nil,
+            data.filename,
+            data.resource_name or nil,
+            nil
+        )
 
         res.writeHead(200, { ["Content-Type"] = "application/json" })
         res.send(json.encode({ ok = true }, { indent = false, sort_keys = false }))
