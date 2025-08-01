@@ -43,7 +43,9 @@ SetHttpHandler(function(req, res)
         req.setDataHandler(function(chunk) body = body .. chunk end)
         local success, data = pcall(json.decode, body)
         if not success then
-            res.send("Invalid JSON")
+            res.writeHead(400, { ["Content-Type"] = "application/json" })
+            res.send(json.encode({ ok = false, msg = "Invalid JSON" },
+                { indent = false, sort_keys = false }))
             return
         end
 
@@ -78,7 +80,9 @@ SetHttpHandler(function(req, res)
         req.setDataHandler(function(chunk) body = body .. chunk end)
         local success, data = pcall(json.decode, body)
         if not success then
-            res.send("Invalid JSON")
+            res.writeHead(400, { ["Content-Type"] = "application/json" })
+            res.send(json.encode({ ok = false, msg = "Invalid JSON" },
+                { indent = false, sort_keys = false }))
             return
         end
 
@@ -105,7 +109,7 @@ SetHttpHandler(function(req, res)
         res.writeHead(200, { ["Content-Type"] = "application/json" })
         res.send(json.encode({ ok = true }, { indent = false, sort_keys = false }))
     else
-        LogWarn(("Webhook: Received %s %s request from %s"):format(req.method, req.path, req.address))
+        LogWarn(("Webhook: Received %s %s request from [%s]"):format(req.method, req.path, req.address))
 
         res.writeHead(404, { ["Content-Type"] = "application/json" })
         res.send(json.encode({ ok = false, msg = 'Route not found' }, { indent = false, sort_keys = false }))
