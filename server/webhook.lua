@@ -1,6 +1,7 @@
 -- Utils
 
 local function getDetails()
+    -- TODO: Also retrieve tasks list.
     local auth = GetAuth()
     return {
         auth = auth

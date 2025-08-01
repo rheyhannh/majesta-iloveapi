@@ -7,6 +7,7 @@ Config.Debug = true
 -- Enable logging to file (set to `false` to disable).
 -- This will logs every process and transactions (including the failed) you made to ILoveApi servers,
 -- allowing you to track your transactions and debug your script.
+-- TODO: Implement file logging.
 Config.Log = true
 
 -- Your ILoveApi public key.

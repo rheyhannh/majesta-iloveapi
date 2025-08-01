@@ -10,7 +10,7 @@
 --- @param filename string Desired file name (with extension) for the saved image (e.g., `'result.jpg'`).
 --- @param resourceName string Name of the target resource where the image should be saved.
 local function _downloadImage(url, headers, path, filename, resourceName)
-    -- TODO: Sanitize params.
+    -- FIXME: Sanitize params.
     PerformHttpRequest(url, function(status, data, resHeaders)
         local fullPath = nil
         if status ~= 200 then
@@ -54,7 +54,7 @@ end
 --- @param y? integer Y-coordinate of the crop origin (default: `0`).
 --- @param cb? function Callback to handle the result manually instead of triggering the download.
 function CropImageSync(imageUrl, path, filename, resourceName, width, height, x, y, cb)
-    -- TODO: Sanitize params.
+    -- FIXME: Sanitize params.
     resourceName = resourceName or GetCurrentResourceName()
     local server = nil
     local task = nil
@@ -154,7 +154,7 @@ end)
 --- @param resourceName? string Name of the resource folder to save the file in (e.g., `'my-resource'`).
 --- @param cb? function Callback to handle the result manually instead of triggering the download.
 function RemoveBackgroundImageSync(imageUrl, path, filename, resourceName, cb)
-    -- TODO: Sanitize params.
+    -- FIXME: Sanitize params.
     resourceName = resourceName or GetCurrentResourceName()
     local server = nil
     local task = nil
