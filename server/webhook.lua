@@ -36,7 +36,7 @@ end
 if Config.UseWebhook then
     SetHttpHandler(function(req, res)
         if req.path == Config.WebhookPath .. '/details' and req.method == "GET" then
-            LogDebug(("Webhook: Received %s %s request from %s"):format(req.method, req.path, req.address))
+            LogDebug(("Webhook: Received %s %s request from [%s]"):format(req.method, req.path, req.address))
 
             res.writeHead(200, { ["Content-Type"] = "application/json" })
             res.send(json.encode({ ok = true, code = 200, data = getDetails() }, { indent = false, sort_keys = false }))
@@ -44,7 +44,7 @@ if Config.UseWebhook then
             local body = ""
             req.setDataHandler(function(chunk) body = body .. chunk end)
             local success, data = pcall(json.decode, body)
-            if not success then
+            if not success or not data or data == '' then
                 res.writeHead(400, { ["Content-Type"] = "application/json" })
                 res.send(json.encode({ ok = false, code = 400, msg = "Invalid JSON" },
                     { indent = false, sort_keys = false }))
@@ -81,7 +81,7 @@ if Config.UseWebhook then
             local body = ""
             req.setDataHandler(function(chunk) body = body .. chunk end)
             local success, data = pcall(json.decode, body)
-            if not success then
+            if not success or not data or data == '' then
                 res.writeHead(400, { ["Content-Type"] = "application/json" })
                 res.send(json.encode({ ok = false, code = 400, msg = "Invalid JSON" },
                     { indent = false, sort_keys = false }))
