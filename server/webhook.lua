@@ -72,6 +72,7 @@ if Config.UseWebhook then
                 data.height,
                 data.x or 0,
                 data.y or 0,
+                nil,
                 nil
             )
 
@@ -105,6 +106,7 @@ if Config.UseWebhook then
                 data.path or nil,
                 data.filename,
                 data.resource_name or nil,
+                nil,
                 nil
             )
 

@@ -9,7 +9,8 @@
 --- @param path? string Relative folder path inside the resource (should end with `/`). Use `nil`, to save on root of resource folder.
 --- @param filename string Desired file name (with extension) for the saved image (e.g., `'result.jpg'`).
 --- @param resourceName string Name of the target resource where the image should be saved.
-local function _downloadImage(url, headers, path, filename, resourceName)
+--- @param cb? function Callback function to executed after the download is complete.
+local function _downloadImage(url, headers, path, filename, resourceName, cb)
     -- FIXME: Sanitize params.
     PerformHttpRequest(url, function(status, data, resHeaders)
         local fullPath = nil
@@ -27,6 +28,9 @@ local function _downloadImage(url, headers, path, filename, resourceName)
         local success = SaveResourceFile(resourceName, fullPath, data, #data)
         if success then
             LogDebug(('Downloaded processed image to: %s'):format(fullPath))
+            if type(cb) == 'function' then
+                cb()
+            end
         else
             LogError(('Failed to download processed image: %s'):format(fullPath))
         end
@@ -39,10 +43,11 @@ end
 --- 1. Starts a `cropimage` task,
 --- 2. Uploads the image from the provided URL,
 --- 3. Processes it with the specified crop dimensions,
---- 4. Downloads the processed image to the specified `resourceName` folder and `path` **if no callback is provided**.
+--- 4. Downloads the processed image to the specified `resourceName` folder and `path` **only if no callback `cb` is provided**.
+--- 5. Execute downloader callback `dwcb` after the image is downloaded **only if no callback `cb` is provided**.
 ---
 --- If a `cb` (callback function) is provided, the download step will be skipped and the callback will receive the result data
---- so you can handle it on your way.
+--- so you can handle it on your way. Otherwise you can add logic after image is downloaded by providing downloader callback in `dwcb`.
 ---
 --- @param imageUrl string URL of the image to be processed.
 --- @param path? string Folder path to store the processed image (should end with `/`, e.g., `'results/'`).
@@ -53,7 +58,8 @@ end
 --- @param x? integer X-coordinate of the crop origin (default: `0`).
 --- @param y? integer Y-coordinate of the crop origin (default: `0`).
 --- @param cb? function Callback to handle the result manually instead of triggering the download.
-function CropImageSync(imageUrl, path, filename, resourceName, width, height, x, y, cb)
+--- @param dwcb? function Callback function to executed after the download is complete.
+function CropImageSync(imageUrl, path, filename, resourceName, width, height, x, y, cb, dwcb)
     -- FIXME: Sanitize params.
     resourceName = resourceName or GetCurrentResourceName()
     local server = nil
@@ -131,29 +137,31 @@ function CropImageSync(imageUrl, path, filename, resourceName, width, height, x,
             timer = timer
         })
     else
-        _downloadImage(downloadSetup.url, headers, path, downloadFilename, resourceName)
+        _downloadImage(downloadSetup.url, headers, path, downloadFilename, resourceName, dwcb)
     end
 end
 
-exports('CropImageSync', function(imageUrl, path, filename, resourceName, width, height, x, y, cb)
-    CropImageSync(imageUrl, path, filename, resourceName, width, height, x, y, cb)
+exports('CropImageSync', function(imageUrl, path, filename, resourceName, width, height, x, y, cb, dwcb)
+    CropImageSync(imageUrl, path, filename, resourceName, width, height, x, y, cb, dwcb)
 end)
 
 --- Executes a complete image background removal flow using ILoveApi:
 --- 1. Starts a `removebackgroundimage` task,
 --- 2. Uploads the image from the provided URL,
 --- 3. Processes it with removing background image,
---- 4. Downloads the processed image to the specified `resourceName` folder and `path` **if no callback is provided**.
----
+--- 4. Downloads the processed image to the specified `resourceName` folder and `path` **only if no callback `cb` is provided**.
+--- 5. Execute downloader callback `dwcb` after the image is downloaded **only if no callback `cb` is provided**.
+--- 
 --- If a `cb` (callback function) is provided, the download step will be skipped and the callback will receive the result data
---- so you can handle it on your way.
+--- so you can handle it on your way. Otherwise you can add logic after image is downloaded by providing downloader callback in `dwcb`.
 ---
 --- @param imageUrl string URL of the image to be processed.
 --- @param path? string Folder path to store the processed image (should end with `/`, e.g., `'results/'`).
 --- @param filename string Name of the output file including its extension (e.g., `'result.jpg'`).
 --- @param resourceName? string Name of the resource folder to save the file in (e.g., `'my-resource'`).
 --- @param cb? function Callback to handle the result manually instead of triggering the download.
-function RemoveBackgroundImageSync(imageUrl, path, filename, resourceName, cb)
+--- @param dwcb? function Callback function to executed after the download is complete.
+function RemoveBackgroundImageSync(imageUrl, path, filename, resourceName, cb, dwcb)
     -- FIXME: Sanitize params.
     resourceName = resourceName or GetCurrentResourceName()
     local server = nil
@@ -230,10 +238,10 @@ function RemoveBackgroundImageSync(imageUrl, path, filename, resourceName, cb)
             timer = timer
         })
     else
-        _downloadImage(downloadSetup.url, headers, path, downloadFilename, resourceName)
+        _downloadImage(downloadSetup.url, headers, path, downloadFilename, resourceName, dwcb)
     end
 end
 
-exports('RemoveBackgroundImageSync', function(imageUrl, path, filename, resourceName, cb)
-    RemoveBackgroundImageSync(imageUrl, path, filename, resourceName, cb)
+exports('RemoveBackgroundImageSync', function(imageUrl, path, filename, resourceName, cb, dwcb)
+    RemoveBackgroundImageSync(imageUrl, path, filename, resourceName, cb, dwcb)
 end)
