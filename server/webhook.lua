@@ -39,14 +39,14 @@ if Config.UseWebhook then
             LogDebug(("Webhook: Received %s %s request from %s"):format(req.method, req.path, req.address))
 
             res.writeHead(200, { ["Content-Type"] = "application/json" })
-            res.send(json.encode({ ok = true, data = getDetails() }, { indent = false, sort_keys = false }))
+            res.send(json.encode({ ok = true, code = 200, data = getDetails() }, { indent = false, sort_keys = false }))
         elseif req.path == Config.WebhookPath .. '/cropimage' and req.method == 'POST' then
             local body = ""
             req.setDataHandler(function(chunk) body = body .. chunk end)
             local success, data = pcall(json.decode, body)
             if not success then
                 res.writeHead(400, { ["Content-Type"] = "application/json" })
-                res.send(json.encode({ ok = false, msg = "Invalid JSON" },
+                res.send(json.encode({ ok = false, code = 400, msg = "Invalid JSON" },
                     { indent = false, sort_keys = false }))
                 return
             end
@@ -58,7 +58,7 @@ if Config.UseWebhook then
 
             if invalidData then
                 res.writeHead(400, { ["Content-Type"] = "application/json" })
-                res.send(json.encode({ ok = false, msg = invalidData },
+                res.send(json.encode({ ok = false, code = 400, msg = invalidData },
                     { indent = false, sort_keys = false }))
                 return
             end
@@ -76,14 +76,14 @@ if Config.UseWebhook then
             )
 
             res.writeHead(200, { ["Content-Type"] = "application/json" })
-            res.send(json.encode({ ok = true }, { indent = false, sort_keys = false }))
+            res.send(json.encode({ ok = true, code = 200 }, { indent = false, sort_keys = false }))
         elseif req.path == Config.WebhookPath .. '/removebackgroundimage' and req.method == 'POST' then
             local body = ""
             req.setDataHandler(function(chunk) body = body .. chunk end)
             local success, data = pcall(json.decode, body)
             if not success then
                 res.writeHead(400, { ["Content-Type"] = "application/json" })
-                res.send(json.encode({ ok = false, msg = "Invalid JSON" },
+                res.send(json.encode({ ok = false, code = 400, msg = "Invalid JSON" },
                     { indent = false, sort_keys = false }))
                 return
             end
@@ -95,7 +95,7 @@ if Config.UseWebhook then
 
             if invalidData then
                 res.writeHead(400, { ["Content-Type"] = "application/json" })
-                res.send(json.encode({ ok = false, msg = invalidData },
+                res.send(json.encode({ ok = false, code = 400, msg = invalidData },
                     { indent = false, sort_keys = false }))
                 return
             end
@@ -109,12 +109,13 @@ if Config.UseWebhook then
             )
 
             res.writeHead(200, { ["Content-Type"] = "application/json" })
-            res.send(json.encode({ ok = true }, { indent = false, sort_keys = false }))
+            res.send(json.encode({ ok = true, code = 200 }, { indent = false, sort_keys = false }))
         else
             LogWarn(("Webhook: Received %s %s request from [%s]"):format(req.method, req.path, req.address))
 
             res.writeHead(404, { ["Content-Type"] = "application/json" })
-            res.send(json.encode({ ok = false, msg = 'Route not found' }, { indent = false, sort_keys = false }))
+            res.send(json.encode({ ok = false, code = 404, msg = 'Route not found' },
+                { indent = false, sort_keys = false }))
         end
     end)
 end
