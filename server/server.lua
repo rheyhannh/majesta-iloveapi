@@ -28,7 +28,7 @@ local function _downloadImage(url, headers, path, filename, resourceName, cb)
         local success = SaveResourceFile(resourceName, fullPath, data, #data)
         if success then
             LogDebug(('Downloaded processed image to: %s'):format(fullPath))
-            if type(cb) == 'function' then
+            if cb then
                 cb()
             end
         else
