@@ -73,10 +73,10 @@ After registering, log in and go to the [Projects](https://www.iloveapi.com/user
    ```
 3. Go to the [GitHub Releases](https://github.com/rheyhannh/majesta-iloveapi/releases), download the **latest version** of the code.
 5. Add the **majesta-iloveapi** folder to your server’s `resources` directory. Make sure to `ensure` this resource **before** any other resource that uses its exports.
-6. (_Optional_) Adjust any [**Configurations**](https://github.com/rheyhannh/majesta-iloveapi/new/master?filename=README.md#%EF%B8%8F-configurations--sv_configlua) you want to change on `sv_config.lua`
+6. (_Optional_) Adjust any [**Configurations**](https://github.com/rheyhannh/majesta-iloveapi?tab=readme-ov-file#%EF%B8%8F-configurations--sv_configlua) you want to change on `sv_config.lua`
 7. To test its functionality:
-   - Refer to the [**Webhook API**](https://github.com/rheyhannh/majesta-iloveapi/new/master?filename=README.md#-webhook-api--webhooklua) section for instructions on testing with tools like [Postman](https://www.postman.com/).  
-   - Or directly use the [**Exports API**](https://github.com/rheyhannh/majesta-iloveapi/new/master?filename=README.md#-exports-api---serverlua) by calling the provided Lua functions.
+   - Refer to the [**Webhook API**](https://github.com/rheyhannh/majesta-iloveapi?tab=readme-ov-file#-webhook-api--webhooklua) section for instructions on testing with tools like [Postman](https://www.postman.com/).  
+   - Or directly use the [**Exports API**](https://github.com/rheyhannh/majesta-iloveapi?tab=readme-ov-file#-exports-api---serverlua) by calling the provided Lua functions.
 
 ## ⚙️ Configurations — [`sv_config.lua`](https://github.com/rheyhannh/majesta-iloveapi/blob/master/shared/sv_config.lua)
 
@@ -90,7 +90,7 @@ After registering, log in and go to the [Projects](https://www.iloveapi.com/user
 | `UploadUrl`     | ❌ No             | `string`    | Internal formated URL used to upload files to ILoveApi servers. Leave unchanged unless you're forking the resource and implementing a custom flow. |
 | `ProcessUrl`    | ❌ No             | `string`    | Internal formated URL used to process tasks and uploaded files on ILoveApi servers. Leave unchanged unless you're forking the resource and implementing a custom flow. |
 | `DownloadUrl`   | ❌ No             | `string`    | Internal formated URL used to download processed files from ILoveApi servers. Leave unchanged unless you're forking the resource and implementing a custom flow. |
-| `UseWebhook`    | ✅ Yes            | `boolean`   | Enables or disables webhook support. When enabled, you can test image processing, retrieve JWT info, and list all tasks via your server. See the [**Webhook API**](https://github.com/rheyhannh/majesta-iloveapi/new/master?filename=README.md#webhook-api--webhooklua) section below for details. |
+| `UseWebhook`    | ✅ Yes            | `boolean`   | Enables or disables webhook support. When enabled, you can test image processing, retrieve JWT info, and list all tasks via your server. See the [**Webhook API**](https://github.com/rheyhannh/majesta-iloveapi?tab=readme-ov-file#-webhook-api--webhooklua) section below for details. |
 | `WebhookPath`   | ❌ No            | `string`    | Custom path for the webhook endpoint. Default is `/webhook`. **For security, set this in `server.cfg`** using: `set iloveapi_webhook_path "/your_path"`. |
 
 ## ⚡ Exports API - [`server.lua`](https://github.com/rheyhannh/majesta-iloveapi/blob/master/server/server.lua)
