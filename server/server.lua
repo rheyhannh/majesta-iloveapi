@@ -57,7 +57,7 @@ end
 --- @param height integer Crop height in pixels.
 --- @param x? integer X-coordinate of the crop origin (default: `0`).
 --- @param y? integer Y-coordinate of the crop origin (default: `0`).
---- @param cb? function Callback to handle the result manually instead of triggering the download.
+--- @param cb? function Callback function to handle the result manually instead of triggering the download.
 --- @param dwcb? function Callback function to executed after the download is complete.
 function CropImageSync(imageUrl, path, filename, resourceName, width, height, x, y, cb, dwcb)
     -- FIXME: Sanitize params.
@@ -159,7 +159,7 @@ end)
 --- @param path? string Folder path to store the processed image (should end with `/`, e.g., `'results/'`).
 --- @param filename string Name of the output file including its extension (e.g., `'result.jpg'`).
 --- @param resourceName? string Name of the resource folder to save the file in (e.g., `'my-resource'`).
---- @param cb? function Callback to handle the result manually instead of triggering the download.
+--- @param cb? function Callback function to handle the result manually instead of triggering the download.
 --- @param dwcb? function Callback function to executed after the download is complete.
 function RemoveBackgroundImageSync(imageUrl, path, filename, resourceName, cb, dwcb)
     -- FIXME: Sanitize params.
