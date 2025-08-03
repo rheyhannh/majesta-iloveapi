@@ -123,7 +123,7 @@ function CropImageSync(imageUrl, path, filename, resourceName, width, height, x,
 
     local downloadSetup = BuildDownloadReq(server, task)
 
-    if type(cb) == 'function' then
+    if cb then
         cb(downloadSetup.url, {
             token = GetAuth().token, -- Ensure its valid token by re-calling getter.
             server = server,
@@ -224,7 +224,7 @@ function RemoveBackgroundImageSync(imageUrl, path, filename, resourceName, cb, d
 
     local downloadSetup = BuildDownloadReq(server, task)
 
-    if type(cb) == 'function' then
+    if cb then
         cb(downloadSetup.url, {
             token = GetAuth().token, -- Ensure its valid token by re-calling getter.
             server = server,
